@@ -42,3 +42,7 @@ class Ship():
         # 返回小数位置给位置变量
         self.rect.centerx = self.center
         self.rect.bottom = self.bottom
+        
+    def center_ship(self):
+        self.center = self.screen_rect.centerx
+        self.bottom = self.screen_rect.bottom
