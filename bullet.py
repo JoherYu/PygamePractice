@@ -7,7 +7,7 @@ class Bullet(Sprite):
     def __init__(self, ai_settings, screen, ship):
         super().__init__()
         self.screen = screen
-        
+
         # 在(0,0)处创建子弹矩形
         self.rect = pygame.Rect(0, 0, ai_settings.bullet_width, 
                                 ai_settings.bullet_height)
