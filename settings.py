@@ -11,12 +11,26 @@ class Settings():
         self.bullet_height = 15
         self.bullet_color = 60, 60, 60
         self.bullets_allowed = 11  # 允许屏幕同时存在的子弹数
-        # 外星人设置
-        self.fleet_drop_speed = 10  # 外星人降落速度
-        self.fleet_direction = 1  # 方向乘子（"-1"表示向左移动）
-        # 飞船设置
+        # 外星人降落速度设置
+        self.fleet_drop_speed = 10  
+        # 可用飞船数设置
         self.ship_limit = 3
+        # 游戏加速乘子
+        self.speedup_scale = 1.1  
+        # 动态参数设置
+        self.initialize_dynamic_settings()
+        
+    def initialize_dynamic_settings(self):
         # 游戏元素速度设置
         self.ship_speed_factor = 1.5
         self.alien_speed_factor = 1
         self.bullet_speed_factor = 3
+        # 方向乘子（"-1"表示向左移动）
+        self.fleet_direction = 1
+        # 分数基数
+        self.alien_points = 50
+        
+    def increase_speed(self):
+        self.ship_speed_factor *= self.speedup_scale
+        self.alien_speed_factor *= self.speedup_scale
+        self.bullet_speed_factor *= self.speedup_scale

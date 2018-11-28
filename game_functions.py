@@ -6,7 +6,7 @@ from alien import Alien
 from time import sleep
 
 def check_events(ai_settings, screen, ship, bullets, play_button, stats, 
-                 aliens):
+                 aliens, sb):
     """监视事件"""
     for event in pygame.event.get():
         # 退出游戏
@@ -22,10 +22,10 @@ def check_events(ai_settings, screen, ship, bullets, play_button, stats,
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()
             check_play_button(stats, play_button, mouse_x, mouse_y, 
-                              ai_settings, screen, ship, aliens, bullets)
+                              ai_settings, screen, ship, aliens, bullets, sb)
     
 def check_play_button(stats, play_button, mouse_x, mouse_y, 
-                      ai_settings, screen, ship, aliens, bullets):
+                      ai_settings, screen, ship, aliens, bullets, sb):
     button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
     
     if button_clicked and not stats.game_active:  # 防止在游戏进行中重启游戏
@@ -33,6 +33,8 @@ def check_play_button(stats, play_button, mouse_x, mouse_y,
         pygame.mouse.set_visible(False)  # 游戏开始后隐藏光标
         
         stats.reset_stats()  # 重置游戏统计信息
+        ai_settings.initialize_dynamic_settings()  # 初始化游戏设置
+        
         stats.game_active = True  # 更改游戏状态标志
         
         aliens.empty()
@@ -40,6 +42,8 @@ def check_play_button(stats, play_button, mouse_x, mouse_y,
         
         create_fleet(ai_settings, screen, aliens, ship)
         ship.center_ship()
+        
+        sb.prep_score()  # 若不设置此行则在游戏重启时，重置计数板无法显示
         
 """游戏操作标志更新"""
 def check_keydown_events(event, ai_settings, screen, ship, bullets):
@@ -66,7 +70,8 @@ def check_keyup_events(event, ship):
     elif event.key == pygame.K_DOWN:
         ship.moving_down = False
         
-def update_screen(ai_settings, screen, ship, bullets, aliens, play_button, stats):
+def update_screen(ai_settings, screen, ship, bullets, aliens, play_button, 
+                  stats, sb):
     """重绘屏幕"""
     screen.fill(ai_settings.bg_color)
     # 绘制子弹
@@ -75,26 +80,34 @@ def update_screen(ai_settings, screen, ship, bullets, aliens, play_button, stats
     
     ship.blitme()  # 绘制飞船
     aliens.draw(screen)  # 绘制外星人
+    sb.show_score()  # 绘制记分板
     
     if not stats.game_active:
         play_button.draw_button()
     
     pygame.display.flip()  # 刷新
     
-def update_bullets(bullets, aliens, ai_settings, screen, ship):
+def update_bullets(bullets, aliens, ai_settings, screen, ship, stats, sb):
     bullets.update()
     # 删除已消失的子弹
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
-    check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets)
+    check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets, 
+                                  stats, sb)
     
-def check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets):
-    # 检查是否有子弹击中外星人，若有则删除相应对象
+def check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets, 
+                                  stats, sb):
+    # 检查是否有子弹击中外星人，若有则删除相应对象并(if语句块)增加分数
     collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
+    if collisions:
+        stats.score += ai_settings.alien_points
+        sb.prep_score()
+    
     # 若外星人被全灭则创建新的外星人组并清空屏幕上的子弹
     if len(aliens) == 0:
         bullets.empty()
+        ai_settings.increase_speed()
         create_fleet(ai_settings, screen, aliens, ship)
             
 def fire_bullet(ai_settings, screen, ship, bullets):
