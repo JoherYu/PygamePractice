@@ -25,12 +25,15 @@ class Settings():
         self.ship_speed_factor = 1.5
         self.alien_speed_factor = 1
         self.bullet_speed_factor = 3
-        # 方向乘子（"-1"表示向左移动）
-        self.fleet_direction = 1
-        # 分数基数
-        self.alien_points = 50
+        # 乘子与基数
+        self.fleet_direction = 1  # 方向乘子（"-1"表示向左移动）
+        self.score_scale = 1.5  # 分数乘子
+        self.alien_points = 50  # 分数基数
         
     def increase_speed(self):
         self.ship_speed_factor *= self.speedup_scale
         self.alien_speed_factor *= self.speedup_scale
         self.bullet_speed_factor *= self.speedup_scale
+        
+        self.alien_points = int(self.alien_points * self.score_scale)
+        
