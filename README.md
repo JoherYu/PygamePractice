@@ -1,4 +1,5 @@
 # Python练习：基于Pygame的2D小游戏《外星人入侵》
+ * 跟着Python编程从入门到实践敲的项目
 版本： Python3.7.1，Pygame1.9.4
 
 游戏基本操作：  
